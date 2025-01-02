@@ -9,7 +9,7 @@ class AppRoutes {
   static List<GetPage> getRoutes() {
     return [
       GetPage(name: splash, page: () => const SplashScreen()),
-      GetPage(name: home, page: () => HomePage()),
+      GetPage(name: home, page: () => HomeScreen()),
     ];
   }
 }

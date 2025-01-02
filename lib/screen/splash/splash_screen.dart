@@ -13,10 +13,7 @@ class SplashScreen extends StatelessWidget {
     });
     return const Scaffold(
       body: Center(
-        child: Text(
-          'Splash Screen',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-        ),
+        child: FlutterLogo(),
       ),
     );
   }

@@ -1,17 +1,18 @@
+import 'package:budget_tracker_app/components/all_category.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../components/category_component.dart';
-import '../../components/home_component.dart';
+import '../../components/all_spending.dart';
 import '../../components/spend_component.dart';
 import '../../controller/navigation_controller.dart';
 
-class HomePage extends StatelessWidget {
+class HomeScreen extends StatelessWidget {
   final NavigationController controller = Get.put(NavigationController());
   final PageController pageController = PageController();
 
-  HomePage({super.key});
+  HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +30,10 @@ class HomePage extends StatelessWidget {
           controller.changeIndex(index);
         },
         children: const [
-          HomeComponent(),
-          CategoryComponent(),
+          AllSpending(),
           SpendComponent(),
+          AllCategory(),
+          CategoryComponent(),
         ],
       ),
       bottomNavigationBar: Obx(() {
@@ -43,16 +45,32 @@ class HomePage extends StatelessWidget {
           },
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
+              icon: Icon(
+                Icons.money,
+                color: Colors.black54,
+              ),
+              label: 'All Spending',
             ),
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.chart_bar_alt_fill),
-              label: 'Category',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.attach_money),
+              icon: Icon(
+                Icons.attach_money,
+                color: Colors.black54,
+              ),
               label: 'Spend',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.calendar_month_outlined,
+                color: Colors.black54,
+              ),
+              label: 'All category',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                CupertinoIcons.chart_bar,
+                color: Colors.black54,
+              ),
+              label: 'Category',
             ),
           ],
         );

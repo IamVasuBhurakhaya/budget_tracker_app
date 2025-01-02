@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter/services.dart';
 
 class DBHelper {
   DBHelper._();
@@ -7,26 +8,15 @@ class DBHelper {
 
   Database? db;
 
-  // Category Table Attributes
-  String categoryTable = "category";
   String categoryName = "category_name";
   String categoryImage = "category_image";
 
-  // Spending Table Attributes
-  String spendingTable = "spending";
-  String spendingDesc = "spending_desc";
-  String spendingAmount = "spending_amount";
-  String spendingMode = "spending_mode";
-  String spendingDate = "spending_date";
-  String spendingTime = "spending_time";
-  String spendingCategoryId = "spending_category_id";
+  String categoryTable = "category";
 
-  // TODO: Create Database
   Future<void> initDB() async {
     String databasePath = await getDatabasesPath();
 
     String path = "${databasePath}budget.db";
-    // TODO: Create Tables
     db = await openDatabase(path, version: 2, onCreate: (db, _) async {
       String query = '''CREATE TABLE $categoryTable (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,5 +36,21 @@ class DBHelper {
         },
       );
     });
+  }
+
+  Future<int?> insertCategory({
+    required String name,
+    required Uint8List image,
+  }) async {
+    if (db == null) await initDB();
+    String query =
+        "INSERT INTO $categoryTable($categoryName, $categoryImage) VALUES(?, ?);";
+    List list = [name, image];
+    try {
+      return await db?.rawInsert(query, list);
+    } catch (e) {
+      print("Insertion failed: $e");
+      return null;
+    }
   }
 }

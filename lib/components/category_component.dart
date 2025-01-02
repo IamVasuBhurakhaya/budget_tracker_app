@@ -1,8 +1,11 @@
 import 'package:budget_tracker_app/controller/category_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter/services.dart';
 
-List<String> categoryImages = [
+import '../helper/db_helper.dart';
+
+List<String> categoryImage = [
   "assets/images/category/bill.png",
   "assets/images/category/cash.png",
   "assets/images/category/communication.png",
@@ -29,6 +32,7 @@ class CategoryComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     CategoryController controller = Get.put(CategoryController());
+
     return Form(
       key: formKey,
       child: Padding(
@@ -40,36 +44,28 @@ class CategoryComponent extends StatelessWidget {
               controller: categoryController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter any category';
+                  return 'Please enter a category';
                 }
                 return null;
               },
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Colors.black,
-                  ),
+                  borderSide: const BorderSide(color: Colors.black),
                 ),
                 labelText: 'Enter Category',
                 hintText: 'Enter category',
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Colors.black,
-                  ),
+                  borderSide: const BorderSide(color: Colors.black),
                 ),
                 errorBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Colors.redAccent,
-                  ),
+                  borderSide: const BorderSide(color: Colors.redAccent),
                 ),
                 focusedErrorBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Colors.redAccent,
-                  ),
+                  borderSide: const BorderSide(color: Colors.redAccent),
                 ),
               ),
             ),
@@ -81,7 +77,7 @@ class CategoryComponent extends StatelessWidget {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                 ),
-                itemCount: categoryImages.length,
+                itemCount: categoryImage.length,
                 itemBuilder: (context, index) {
                   return GetBuilder<CategoryController>(
                     builder: (controller) {
@@ -92,7 +88,7 @@ class CategoryComponent extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: AssetImage(categoryImages[index]),
+                              image: AssetImage(categoryImage[index]),
                               fit: BoxFit.cover,
                             ),
                             border: Border.all(
@@ -113,26 +109,59 @@ class CategoryComponent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 FloatingActionButton.extended(
-                  onPressed: () {
+                  onPressed: () async {
                     if (formKey.currentState!.validate() &&
                         controller.categoryIndex != null) {
-                      Get.snackbar('Category Added',
-                          ' ${categoryController.text} added successfully',
+                      String name = categoryController.text;
+                      String imagePath =
+                          categoryImage[controller.categoryIndex!];
+                      ByteData data = await rootBundle.load(imagePath);
+                      Uint8List image = data.buffer.asUint8List();
+
+                      int? response = await DBHelper.dbHelper
+                          .insertCategory(name: name, image: image);
+
+                      if (response != null) {
+                        Get.snackbar(
+                          'Category Added',
+                          '${categoryController.text} added',
                           snackPosition: SnackPosition.BOTTOM,
                           colorText: Colors.white,
-                          backgroundColor: Colors.green);
+                          backgroundColor: Colors.green,
+                        );
+                      } else {
+                        Get.snackbar(
+                          'Error',
+                          'Insertion fail',
+                          snackPosition: SnackPosition.BOTTOM,
+                          colorText: Colors.white,
+                          backgroundColor: Colors.red,
+                        );
+                      }
                     } else {
-                      Get.snackbar('Error', 'Please select both',
-                          snackPosition: SnackPosition.BOTTOM,
-                          colorText: Colors.white,
-                          backgroundColor: Colors.red);
+                      Get.snackbar(
+                        'Error',
+                        'Please select a category',
+                        snackPosition: SnackPosition.BOTTOM,
+                        colorText: Colors.white,
+                        backgroundColor: Colors.red,
+                      );
                     }
+
+                    categoryController.clear();
+                    controller.updateCategoryIndex();
                   },
-                  label: const Text('Add'),
-                  icon: const Icon(Icons.add),
+                  label: const Text(
+                    'Add',
+                    style: TextStyle(fontSize: 20, color: Colors.black),
+                  ),
+                  icon: const Icon(
+                    Icons.add,
+                    color: Colors.black,
+                  ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
