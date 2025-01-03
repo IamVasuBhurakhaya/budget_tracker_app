@@ -7,7 +7,7 @@ class AllSpending extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
-        'All Category',
+        'All spending',
         style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
       ),
     );
